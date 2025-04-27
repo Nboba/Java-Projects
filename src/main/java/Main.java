@@ -1,3 +1,4 @@
+import model.Status;
 import service.ServiceTaskImpl;
 import util.FileManager;
 
@@ -9,9 +10,9 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args){
         ServiceTaskImpl serviceTask = new ServiceTaskImpl();
-        System.out.println(ServiceTaskImpl.tasks.toString());
+        serviceTask.deleteTask("8878a22b-d526-472c-9a29-db6a9d2bb6d2");
 /*        try(BufferedReader in = FileManager.getReader("Task");){
-            //serviceTask.AddTask("marshal","Crear una medalla");
+            serviceTask.AddTask("pene","Crear una medalla a pene");
             in.lines().toList().forEach((line)->{
                 String []task = line.split(",");
                 Arrays.stream(task).toList().forEach(System.out::println);

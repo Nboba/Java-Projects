@@ -8,8 +8,7 @@ public class Theme {
     private String name;
     private String description;
 
-    @Override
-    public String toString(){
+    public String toStringTheme(){
         var coma=",";
         return id+coma+name+coma+description;
     }
