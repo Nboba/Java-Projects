@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ServiceTask {
-    Task AddTask(String theme, String description) throws IOException;
+    Task addTask(String theme, String description) throws IOException;
 
 
     Task updateTheme(String id, String theme);
@@ -19,11 +19,7 @@ public interface ServiceTask {
 
     List<Task> getFilteredListByTodo(String todo);
 
-    /*    @Override
-                                                public Task updateTask(String id,String description){
+    List<Task> getFilteredListByTheme(String theme);
 
-                                                }*/
-    void fillTaskMap();
-
-    void saveTasks() throws IOException;
+    List<Task> getFilteredListByThemeAndTodo(String theme, String todo);
 }

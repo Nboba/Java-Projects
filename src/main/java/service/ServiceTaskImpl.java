@@ -1,28 +1,33 @@
 package service;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Data;
 import model.Status;
 import model.Task;
 import util.FileManager;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
 public class ServiceTaskImpl implements ServiceTask {
-    public static HashMap<String,Task> tasks = new HashMap<>();;
+    private static HashMap<String,Task> tasks = new HashMap<>();;
     private FileManager fileManager;
 
     public ServiceTaskImpl(){
         this.fillTaskMap();
     }
+    public Task getTask(String id){
+        return tasks.get(id);
+    }
+    public Set<Task> getTasks(){
+        return  tasks.values().stream().collect(Collectors.toUnmodifiableSet());
+    }
     @Override
-    public Task AddTask(String theme, String description) throws IOException{
+    public Task addTask(String theme, String description) throws IOException{
         if(theme.length() == 0 || description.length() == 0){
             return null;
         }
@@ -40,6 +45,7 @@ public class ServiceTaskImpl implements ServiceTask {
     @Override
     public Task updateTheme(String id, String theme) {
         var task = tasks.get(id);
+        if(task == null) return null;
         task.setTheme(theme);
         task.setUpdate_at(LocalDateTime.now());
         try{
@@ -52,6 +58,7 @@ public class ServiceTaskImpl implements ServiceTask {
     @Override
     public Task updateDescription(String id, String description){
         var task = tasks.get(id);
+        if(task == null) return null;
         task.setDescription(description);
         task.setUpdate_at(LocalDateTime.now());
         try{
@@ -64,6 +71,7 @@ public class ServiceTaskImpl implements ServiceTask {
     @Override
     public Task updateTodo(String id, String todo){
         var task = tasks.get(id);
+        if(task == null) return null;
         task.setStatus(Status.getStatus(todo.toUpperCase()));
         task.setUpdate_at(LocalDateTime.now());
         try{
@@ -88,37 +96,36 @@ public class ServiceTaskImpl implements ServiceTask {
                 task.getStatus().name().compareTo(todo.toUpperCase()) == 0;
         }).collect(Collectors.toUnmodifiableList());
     }
+
     @Override
-    public void fillTaskMap(){
-        try(BufferedReader reader = fileManager.getReader("Task");){
-            reader.lines().toList().forEach((line)->{
-                String []taskFiles = line.split(",");
-                Task task;
-                task= Task.builder().
-                        id(taskFiles[0]).
-                        theme(taskFiles[1]).
-                        description(taskFiles[2]).
-                        status(Status.getStatus(taskFiles[3])).
-                        created_at(LocalDateTime.parse(taskFiles[4])).
-                        build();
-                task.setUpdate_at((taskFiles[5].compareTo("Sin_editar") ==0) ? null: LocalDateTime.parse(taskFiles[5]));
-                tasks.put(task.getId(),task);
+    public List<Task> getFilteredListByTheme(String theme){
+        return tasks.values().stream().filter((task)->  { return
+                task.getTheme().compareTo(theme) == 0;
+        }).collect(Collectors.toUnmodifiableList());
+    }
+    @Override
+    public List<Task> getFilteredListByThemeAndTodo(String theme, String todo){
+        return tasks.values().stream().
+                filter((task)->  { return
+                        task.getTheme().compareTo(theme) == 0;
+                }).filter((task)->  { return
+                        task.getStatus().name().compareTo(todo) == 0;}).
+                collect(Collectors.toUnmodifiableList());
+    }
+    private void fillTaskMap(){
+        try(JsonParser reader = fileManager.getReader("Task");){
+            ArrayList<Task> taks  =reader.readValueAs(new TypeReference<ArrayList<Task>>(){});
+            taks.forEach((tak)->{
+                tasks.put(tak.getId(),tak);
             });
             }
         catch (IOException io){}
     }
 
-    @Override
-    public void saveTasks() throws IOException{
 
+    private void saveTasks() throws IOException{
         try(var file =fileManager.getWriter("Task");) {
-            tasks.values().forEach((tas)->{
-                try{
-                    file.write(tas.toStringTask()+"\n");}
-                catch (IOException io){}
-            });
-
+            file.writePOJO(tasks.values().toArray());
         }
-
     }
 }
