@@ -2,70 +2,120 @@ package console;
 
 import model.Task;
 import service.ServiceTaskImpl;
+import util.ConsoleText;
 import util.FileManager;
 
+
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public  class ConsoleCli {
     public static Scanner scanner= new Scanner(System.in);
     public static ServiceTaskImpl serviceTask = new ServiceTaskImpl();
+    public static List<Task> Tareas= new ArrayList<>(serviceTask.getAllTask());
+    public static List<Task> TareasFiltradas= new ArrayList<>();
 
-    public static void inicioConsole(){
+
+    public static void inicioConsole() throws IOException{
         FileManager.checkFilesExistingIfNotCreated();
-        System.out.println("Bienvenido a Task-cli \n");
-        getInstruccion();
+        System.out.println("Bienvenido a Task-cli ");
+        ConsoleText.INITINSTRUCTION.printValue();
+        System.out.println("Escriba HELP para ver las instrucciones disponibles\n\n");
         do{
-            System.out.printf("Task-cli: ");
+            System.out.print("Task-cli: ");
             String line = scanner.nextLine();
-            System.out.println(line.indexOf(" "));
+            if(line.length()==0) continue;
+            String []lineSplitted= line.split("/");
+            //Arrays.stream(lineSplitted).forEach(System.out::println);
+            lineSplitted[0]=lineSplitted[0].toUpperCase().replace(" ","");
+            try {
+                switch (lineSplitted[0]) {
+                    case "ADD" -> addTaskInst(lineSplitted[1], lineSplitted[2]);
+                    case "UPDATE" -> updateInst(Integer.parseInt(lineSplitted[1]), lineSplitted[2], lineSplitted[3]);
+                    case "DELETE" -> deleteTaskInst(Integer.parseInt(lineSplitted[1]));
+                    case "SHOWALL" -> getAllTask();
+                    case "SHOW" -> getFilteredTodoTask(lineSplitted[1]);
+                    case "HELP" -> ConsoleText.INSTRUCCIONES.printValue();
+                    case "IDS" -> showIds();
+                    case "IDSFIL" -> showIdsFiltered();
+                    default -> ConsoleText.INCORRECTA.printValue();
+                }
+                for(var text:lineSplitted){
+                    System.out.println(text);
+                }
+            }catch (Exception e){
+                System.out.println(e);
+                for(var text:lineSplitted){
+                    System.out.println(text);
+                }
+                System.out.println("Error en el sistema");
+            }
             if(line.compareTo("exit")==0) break;
         }while(true);
     }
-    private static void getInstruccion(){
-        String inst= """
-                add theme= desc=   : Instruccion para agregar una tarea con un TEMA y DESCRIPCION; Se debe agregar un espacio y luego escribir 
-                                     theme=.... y desc="...."
-                update tipo= text= : Instruccion para MODIFICAR el TEMA, DESCRIPCION o estado; Se debe agregar un espacio y luego escribir uno 
-                                     de los siguientes tipo=[theme-status-desc] luego un text=....
-                delete id=         : Instruccion para ELIMINAR una TAREA; Se debe agregar un espacio y luego escribir id=....
-                showAll            : Instruccion para MOSTRAR todas las TAREAS creadas
-                show tema=         : Instruccion para MOSTRAR todas las TAREAS que tengan el TEMA escogido; Se debe agregar un espacio tema=....
-                show status=       : Instruccion para MOSTRAR todas las tareas que tengan el ESTADO escogido; Se debe agregar un espacio status=.....
-                show tema= status= : Instruccion para MOSTRAR todas las tareas que tengan el ESTADO  y TEMA escogidos Se debe agregar un espacio 
-                                     tema=.... y status=.....
-                help               : Muestra las Instrucciones disponibles
-                """;
-        System.out.println(inst);
-    }
+
     private static void addTaskInst(String theme,String description) throws IOException {
-        serviceTask.addTask(theme,description);
-    }
-    private static void deleteTaskInst(String id){
-        serviceTask.deleteTask(id);
-    }
-    private static void updateInst(String id,String updateType ,String text){
-        switch (updateType.toLowerCase()){
-            case "theme"-> serviceTask.updateTheme(id,text);
-            case "status"-> serviceTask.updateTodo(id,text);
-            default -> serviceTask.updateDescription(id,text);
+        if(serviceTask.addTask(theme,description) instanceof Task task){
+            Tareas.add(task);
+            System.out.println("Agregado correctamente");
+        }
+        else{
+            System.out.println("Error al crear Tarea");
         }
     }
-    private static void getFilteredThemeOrTodoTask(String type,String text){
-        List<Task> tasks = switch (type.toLowerCase()){
-            case "theme"-> serviceTask.getFilteredListByTheme(text);
-            default -> serviceTask.getFilteredListByTodo(text);
-        };
-        System.out.printf("Task filtrados por %s: %s \n",type,text);
-        tasks.forEach(System.out::println);
+    private static void deleteTaskInst(int id){
+        String idL= Tareas.get(id).getId();
+        serviceTask.deleteTask(idL);
+        Tareas.remove(id);
+        System.out.println("Eliminado correctamente");
+        System.out.println("Los identificadores");
+
     }
-    private static void getFilteredThemeAndTodoTask(String theme,String todo){
-        List<Task> tasks = serviceTask.getFilteredListByThemeAndTodo(theme,todo);
-        System.out.printf("Task filtrados con tema: %s y estado: %s\n",theme,todo);
-        tasks.forEach(System.out::println);
+    private static void updateInst(int id,String updateType ,String text){
+        String idL= Tareas.get(id).getId();
+        Task task = switch (updateType.toLowerCase()){
+            case "name"-> serviceTask.updateName(idL,text);
+            case "status"-> serviceTask.updateTodo(idL,text);
+            default -> serviceTask.updateDescription(idL,text);
+        };
+        Tareas.remove(id);
+        Tareas.add(task);
+        System.out.println("Modificado correctamente");
+    }
+    private static void getFilteredTodoTask(String text){
+        List<Task> tasks = serviceTask.getFilteredListByTodo(text);
+        TareasFiltradas = tasks.stream().collect(Collectors.toUnmodifiableList());
+        System.out.printf("Task filtrados por %s \n\n\n",text);
+        tasks.forEach(Task::printTodo);
+    }
+    private static void getAllTask(){
+        List<Task> tasks = serviceTask.getAllTask();
+        Tareas = tasks.stream().collect(Collectors.toUnmodifiableList());
+        tasks.forEach(Task::printTodo);
+    }
+    private static void showIds(){
+        if(Tareas.size() != 0){
+        Tareas.forEach((task)->{
+            System.out.printf("             id:%d Tarea: %s Descripcion: %s\n",Tareas.indexOf(task),task.getName(),task.getDescription());
+
+        });}
+        else{
+            System.out.println("             No hay tareas guardadas");
+        }
+    }
+
+    private static void showIdsFiltered(){
+        if(TareasFiltradas.size() != 0){
+            TareasFiltradas.forEach((task)->{
+                System.out.printf("             id:%d Tarea: %s Descripcion: %s\n",Tareas.indexOf(task),task.getName(),task.getDescription());
+            });}
+        else{
+            System.out.println("             No hay tareas filtradas");
+        }
     }
 
 }

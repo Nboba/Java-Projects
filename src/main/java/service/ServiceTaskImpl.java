@@ -27,13 +27,13 @@ public class ServiceTaskImpl implements ServiceTask {
         return  tasks.values().stream().collect(Collectors.toUnmodifiableSet());
     }
     @Override
-    public Task addTask(String theme, String description) throws IOException{
-        if(theme.length() == 0 || description.length() == 0){
+    public Task addTask(String name, String description) throws IOException{
+        if(name.length() == 0 || description.length() == 0){
             return null;
         }
         Task task=  Task.builder().
                 id(UUID.randomUUID().toString()).
-                theme(theme).
+                name(name).
                 description(description).
                 build();
         tasks.put(task.getId(),task);
@@ -43,11 +43,12 @@ public class ServiceTaskImpl implements ServiceTask {
     }
 
     @Override
-    public Task updateTheme(String id, String theme) {
+    public Task updateName(String id, String name) {
         var task = tasks.get(id);
         if(task == null) return null;
-        task.setTheme(theme);
+        task.setName(name);
         task.setUpdate_at(LocalDateTime.now());
+        tasks.put(task.getId(),task);
         try{
             this.saveTasks();
         }
@@ -61,6 +62,7 @@ public class ServiceTaskImpl implements ServiceTask {
         if(task == null) return null;
         task.setDescription(description);
         task.setUpdate_at(LocalDateTime.now());
+        tasks.put(task.getId(),task);
         try{
             this.saveTasks();
         }
@@ -74,6 +76,7 @@ public class ServiceTaskImpl implements ServiceTask {
         if(task == null) return null;
         task.setStatus(Status.getStatus(todo.toUpperCase()));
         task.setUpdate_at(LocalDateTime.now());
+        tasks.put(task.getId(),task);
         try{
             this.saveTasks();
         }
@@ -86,6 +89,7 @@ public class ServiceTaskImpl implements ServiceTask {
         tasks.remove(id);
         try{
             this.saveTasks();
+
         }
         catch (IOException io){}
     }
@@ -97,20 +101,8 @@ public class ServiceTaskImpl implements ServiceTask {
         }).collect(Collectors.toUnmodifiableList());
     }
 
-    @Override
-    public List<Task> getFilteredListByTheme(String theme){
-        return tasks.values().stream().filter((task)->  { return
-                task.getTheme().compareTo(theme) == 0;
-        }).collect(Collectors.toUnmodifiableList());
-    }
-    @Override
-    public List<Task> getFilteredListByThemeAndTodo(String theme, String todo){
-        return tasks.values().stream().
-                filter((task)->  { return
-                        task.getTheme().compareTo(theme) == 0;
-                }).filter((task)->  { return
-                        task.getStatus().name().compareTo(todo) == 0;}).
-                collect(Collectors.toUnmodifiableList());
+    public List<Task> getAllTask(){
+        return tasks.values().stream().collect(Collectors.toUnmodifiableList());
     }
     private void fillTaskMap(){
         try(JsonParser reader = fileManager.getReader("Task");){

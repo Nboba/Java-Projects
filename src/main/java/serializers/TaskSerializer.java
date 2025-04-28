@@ -22,7 +22,7 @@ public class TaskSerializer extends StdSerializer<Task> {
         var updated= (task.getUpdate_at() == null)? "Sin_editar":task.getUpdate_at().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm"));
         jsonGenerator.writeStartObject();
         jsonGenerator.writeString(task.getId());
-        jsonGenerator.writeString(task.getTheme());
+        jsonGenerator.writeString(task.getName());
         jsonGenerator.writeString(task.getDescription());
         jsonGenerator.writeString(task.getStatus().name());
         jsonGenerator.writeString(task.getCreated_at().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm")));

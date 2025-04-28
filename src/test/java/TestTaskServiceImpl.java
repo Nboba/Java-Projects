@@ -22,15 +22,15 @@ public class TestTaskServiceImpl {
     @Test
     public void testAddTaskCorrect() throws IOException {
         var task = serviceTask.addTask(theme,description);
-        assertEquals(theme,task.getTheme());
+        assertEquals(theme,task.getName());
         assertEquals(description,task.getDescription());
         serviceTask.deleteTask(task.getId());
     }
     @Test
-    public void testUpdateTheme() throws IOException{
-        String newTheme="Olds";
+    public void testUpdateName() throws IOException{
+        String newName="Olds";
         var task = serviceTask.addTask(theme,description);
-        assertEquals(newTheme,serviceTask.updateTheme(task.getId(),newTheme).getTheme());
+        assertEquals(newName,serviceTask.updateName(task.getId(),newName).getName());
         serviceTask.deleteTask(task.getId());
     }
     @Test
