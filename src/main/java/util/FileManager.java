@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Data;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
 import java.nio.file.Files;
 
 @Data
