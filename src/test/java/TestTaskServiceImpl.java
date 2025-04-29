@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import model.Status;
 import model.Task;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.junit.Test;
 import service.ServiceTaskImpl;
 import util.FileManager;
@@ -51,6 +53,6 @@ public class TestTaskServiceImpl {
     public void testDeleteTask() throws IOException{
         var task = serviceTask.addTask(theme,description);
         serviceTask.deleteTask(task.getId());
-        assertEquals(false,serviceTask.getTasks().contains(task));
+        assertFalse(serviceTask.getTasks().contains(task));
     }
 }

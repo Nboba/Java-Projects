@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class ServiceTaskImpl implements ServiceTask {
-    private static HashMap<String,Task> tasks = new HashMap<>();;
+    private static HashMap<String,Task> tasks = new HashMap<>();
     private FileManager fileManager;
 
     public ServiceTaskImpl(){
@@ -102,10 +102,11 @@ public class ServiceTaskImpl implements ServiceTask {
     }
 
     public List<Task> getAllTask(){
-        return tasks.values().stream().collect(Collectors.toUnmodifiableList());
+        return tasks.values().stream().sorted().collect(Collectors.toUnmodifiableList());
     }
+
     private void fillTaskMap(){
-        try(JsonParser reader = fileManager.getReader("Task");){
+        try(JsonParser reader = FileManager.getReader("Task")){
             ArrayList<Task> taks  =reader.readValueAs(new TypeReference<ArrayList<Task>>(){});
             taks.forEach((tak)->{
                 tasks.put(tak.getId(),tak);
@@ -116,8 +117,10 @@ public class ServiceTaskImpl implements ServiceTask {
 
 
     private void saveTasks() throws IOException{
-        try(var file =fileManager.getWriter("Task");) {
+        try(var file = FileManager.getWriter("Task")) {
             file.writePOJO(tasks.values().toArray());
         }
     }
+
+
 }

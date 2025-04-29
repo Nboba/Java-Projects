@@ -8,19 +8,19 @@ import util.FileManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
+
 
 public  class ConsoleCli {
     public static Scanner scanner= new Scanner(System.in);
     public static ServiceTaskImpl serviceTask = new ServiceTaskImpl();
     public static List<Task> Tareas= new ArrayList<>(serviceTask.getAllTask());
     public static List<Task> TareasFiltradas= new ArrayList<>();
+    public static String lastShow="all";
 
 
-    public static void inicioConsole() throws IOException{
+    public static void inicioConsole(){
         FileManager.checkFilesExistingIfNotCreated();
         System.out.println("Bienvenido a Task-cli ");
         ConsoleText.INITINSTRUCTION.printValue();
@@ -28,15 +28,20 @@ public  class ConsoleCli {
         do{
             System.out.print("Task-cli: ");
             String line = scanner.nextLine();
-            if(line.length()==0) continue;
+            if(line.isEmpty()) continue;
             String []lineSplitted= line.split("/");
-            //Arrays.stream(lineSplitted).forEach(System.out::println);
             lineSplitted[0]=lineSplitted[0].toUpperCase().replace(" ","");
             try {
                 switch (lineSplitted[0]) {
                     case "ADD" -> addTaskInst(lineSplitted[1], lineSplitted[2]);
-                    case "UPDATE" -> updateInst(Integer.parseInt(lineSplitted[1]), lineSplitted[2], lineSplitted[3]);
-                    case "DELETE" -> deleteTaskInst(Integer.parseInt(lineSplitted[1]));
+                    case "UPDATE" -> {
+                        updateInst(Integer.parseInt(lineSplitted[1]), lineSplitted[2], lineSplitted[3]);
+                        showPertinentId();
+                    }
+                    case "DELETE" -> {
+                        deleteTaskInst(Integer.parseInt(lineSplitted[1]));
+                        showPertinentId();
+                    }
                     case "SHOWALL" -> getAllTask();
                     case "SHOW" -> getFilteredTodoTask(lineSplitted[1]);
                     case "HELP" -> ConsoleText.INSTRUCCIONES.printValue();
@@ -44,14 +49,7 @@ public  class ConsoleCli {
                     case "IDSFIL" -> showIdsFiltered();
                     default -> ConsoleText.INCORRECTA.printValue();
                 }
-                for(var text:lineSplitted){
-                    System.out.println(text);
-                }
             }catch (Exception e){
-                System.out.println(e);
-                for(var text:lineSplitted){
-                    System.out.println(text);
-                }
                 System.out.println("Error en el sistema");
             }
             if(line.compareTo("exit")==0) break;
@@ -62,6 +60,7 @@ public  class ConsoleCli {
         if(serviceTask.addTask(theme,description) instanceof Task task){
             Tareas.add(task);
             System.out.println("Agregado correctamente");
+            task.printTodo();
         }
         else{
             System.out.println("Error al crear Tarea");
@@ -72,8 +71,6 @@ public  class ConsoleCli {
         serviceTask.deleteTask(idL);
         Tareas.remove(id);
         System.out.println("Eliminado correctamente");
-        System.out.println("Los identificadores");
-
     }
     private static void updateInst(int id,String updateType ,String text){
         String idL= Tareas.get(id).getId();
@@ -88,34 +85,46 @@ public  class ConsoleCli {
     }
     private static void getFilteredTodoTask(String text){
         List<Task> tasks = serviceTask.getFilteredListByTodo(text);
-        TareasFiltradas = tasks.stream().collect(Collectors.toUnmodifiableList());
-        System.out.printf("Task filtrados por %s \n\n\n",text);
-        tasks.forEach(Task::printTodo);
+        if(tasks.isEmpty()){
+            System.out.println("No hay tareas guardadas");
+        }else{
+            TareasFiltradas = tasks.stream().toList();
+            System.out.printf("             Task filtrados por %s \n\n\n",text.toUpperCase());
+            tasks.forEach(Task::printTodo);
+        }
     }
     private static void getAllTask(){
         List<Task> tasks = serviceTask.getAllTask();
-        Tareas = tasks.stream().collect(Collectors.toUnmodifiableList());
-        tasks.forEach(Task::printTodo);
+        if(tasks.isEmpty()) {
+            System.out.println("No hay tareas guardadas");
+        }else {
+            Tareas = tasks.stream().toList();
+            tasks.forEach(Task::printTodo);
+        }
     }
     private static void showIds(){
-        if(Tareas.size() != 0){
-        Tareas.forEach((task)->{
-            System.out.printf("             id:%d Tarea: %s Descripcion: %s\n",Tareas.indexOf(task),task.getName(),task.getDescription());
+        if(!Tareas.isEmpty()){
+        Tareas.forEach((task) -> task.showPrint(Tareas.indexOf(task)));
 
-        });}
-        else{
+            lastShow = "all";
+        }else{
             System.out.println("             No hay tareas guardadas");
         }
     }
 
     private static void showIdsFiltered(){
-        if(TareasFiltradas.size() != 0){
-            TareasFiltradas.forEach((task)->{
-                System.out.printf("             id:%d Tarea: %s Descripcion: %s\n",Tareas.indexOf(task),task.getName(),task.getDescription());
-            });}
-        else{
+        if(!TareasFiltradas.isEmpty()) {
+            TareasFiltradas.forEach((task) -> task.showPrint(Tareas.indexOf(task)));
+            lastShow = "fil";
+        }else{
             System.out.println("             No hay tareas filtradas");
         }
     }
 
+    private static void showPertinentId(){
+        switch (lastShow){
+            case"fil"->showIdsFiltered();
+            default -> showIds();
+        }
+    }
 }

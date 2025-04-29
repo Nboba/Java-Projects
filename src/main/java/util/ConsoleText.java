@@ -8,20 +8,20 @@ public enum ConsoleText {
                """),
     INITINSTRUCTION(
                 """
-                    ------------------------------------------------------------------------------------------------------------------------------------------
+                    -------------------------------------------------------------------------------------------------------------------------------------------------
                         Las instrucciones se componen en una palabra clave compuesta de puras mayusculas, luego se agrega las entradas requeridas en un  orden pre-
                         establecido, pueden haber desde cero a 3 campos requeridos, estas pueden ser una palabra o oracion, para separar entre campo de ingreso 
                         utilizar el caracter slash /.
-                    ------------------------------------------------------------------------------------------------------------------------------------------
+                    -------------------------------------------------------------------------------------------------------------------------------------------------
                 """),
     INSTRUCCIONES("""
-                         Existen 5 instrucciones, debe mantener el orden de los campos ingresados:
+                         Existen 7 instrucciones, debe mantener el orden de los campos ingresados:
                             -ADD /(nombre de la tarea)/(descripcion): Agrega una tarea.
                             -UPDATE /(identificador)/(name-status-desc)/(descripcion): Modifica una tarea.
                             -DELETE /(identificador): Elimina una tarea.
                             -SHOWALL: Muestra todas las tareas creadas.
                             -SHOW /(estado de la tarea): Muestra las tareas de manera condicional dependiendo del estado.
-                            -IDS: Muestra los identificadores de las tareas con su nombre y descripcion.
+                            -IDS: Muestra los identificadores(ID) de las tareas con su nombre y descripcion.
                             -IDFIL: Muestra lo mismo que IDS, pero solo de las tareas que se filtraron al haber aplicado SHOW antes.
             """),
     ADD(

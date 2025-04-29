@@ -18,12 +18,11 @@ public abstract class FileManager implements AutoCloseable {
     private static final String cliName="TaskCli";
     private static final String userPath = System.getProperties().getProperty("user.home")+"\\Documents\\"+cliName;
     private static final String taskPath = userPath + "\\tasks.json";
-    private static final String themePath = userPath + "\\theme.json";;
     private static ObjectMapper mapper =getMapper();
-                                            ;
+
     public static void checkFilesExistingIfNotCreated(){
         try{
-           for(var path: new String[]{userPath,taskPath,themePath}){
+           for(var path: new String[]{userPath,taskPath}){
                File file = new File(path);
                if(!file.exists()) {
                    if(userPath.compareTo(path) == 0) {
@@ -45,10 +44,8 @@ public abstract class FileManager implements AutoCloseable {
 
     public static JsonGenerator getWriter(String fileName) {
         try {
-            File file = switch (fileName.toLowerCase()){
-                case "task"-> new File(taskPath);
-                default -> new File(themePath);
-            };
+            File file = new File(taskPath);
+
             JsonGenerator writer =  mapper.createGenerator(FileManager.getTaskFile(), JsonEncoding.UTF8);
             return writer;
         } catch (Exception ex) {
@@ -58,10 +55,7 @@ public abstract class FileManager implements AutoCloseable {
     }
     public static JsonParser getReader(String fileName) {
         try {
-            File file = switch (fileName){
-                case "Task"-> new File(taskPath);
-                default -> new File(themePath);
-            };
+            File file = new File(taskPath);
             FileReader reader = new FileReader(file);
             return mapper.createParser(FileManager.getTaskFile());
         } catch (Exception ex) {
@@ -72,9 +66,6 @@ public abstract class FileManager implements AutoCloseable {
 
     public static File getTaskFile(){
         return new File(taskPath);
-    }
-    public static File getThemeFile(){
-        return new File(themePath);
     }
     private static ObjectMapper getMapper() {
         mapper = new ObjectMapper().

@@ -1,18 +1,14 @@
 package model;
 
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
 @Data
 @Builder
-public class Task   {
+public class Task implements Comparable {
     private String id;
     private String name;
     private String description;
@@ -63,6 +59,15 @@ public class Task   {
                 created_at.format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm")),
                 updated,
                 description);
+    }
+    public void showPrint(int index){
+        System.out.printf("             -[ID]:%d [TAREA]: %s [ESTADO]: %s\n", index, name, status);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Task local= (Task)o;
+        return -this.getCreated_at().compareTo(local.getCreated_at());
     }
 }
 
