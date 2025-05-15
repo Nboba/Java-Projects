@@ -1,0 +1,7 @@
+<form>
+    <p-floatlabel variant="on">
+        <input pInputText id="inputTitle" [formControl]="this.inputTitle" autocomplete="off" />
+        <label for="inputTitle">Nombre del Blog</label>
+        <p-button label="crear" icon="pi pi-check" iconPos="right" (onClick)="postBlog()"/>
+    </p-floatlabel>
+</form>

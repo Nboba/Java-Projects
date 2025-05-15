@@ -1,0 +1,14 @@
+
+
+<p-scrollpanel>
+    <div class="flex flex-col gap-4">
+        @for (blog of this.blogs(); track blog.id) {
+            <app-blog 
+            [blog]="blog" 
+            (click)="changeBlogClick(blog.id,blog.title)" 
+            (deleteBlog)="deleteBlog($event)"
+            [idActiveBlogInput]="getActiveBlog()"
+            />
+        }
+    </div>
+</p-scrollpanel>

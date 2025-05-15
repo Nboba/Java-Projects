@@ -1,0 +1,35 @@
+
+
+
+<div class="w-full " [class]="this.idActiveBlogInput()===this.blog().id? 'border-4 border-[#7e996d] p-4 pt-0.5 rounded-2xl':''">
+    <p-fieldset [toggleable]="true"  legend="{{this.blog().fechaCreacion|date:'medium'}}" >
+        <div>
+            @if(!this.isEditingContent()){
+                <h1 class="text-3xl font-bold text-wrap">
+                    {{this.blog().title}}
+                </h1>
+            }@else {
+                <form class="card flex w-full" >
+                    <textarea class="w-full" pTextarea  [formControl]="this.title"></textarea>
+                </form>
+            }
+        </div>
+        <div class="flex flex-row place-items-center m-0 pt-4">
+            <div class="flex flex-row">
+
+                @if(!this.isEditingContent()){
+                    <app-button-delete [id]="this.blog().id" [type]="'Blog'" (deleteItem)="deleteBlogs()"/>
+                    <p-button label="Editar" rounded text (onClick)="activeEditContent()" severity="info" [raised]="true"/>
+                    
+                }@else {
+                    <p-button label="Cancelar" rounded text (onClick)="cancelPatch()" severity="danger"/>
+                    <p-button label="Guardar" rounded text (onClick)="patchContent()" severity="success" />
+                    
+                }
+            </div>
+            <div class="flex-1 float-right text-end">
+                <span class="text-surface-500 dark:text-surface-400">{{this.blog().fechaEdicion|date:"medium"}}</span>
+            </div>
+        </div>
+    </p-fieldset>
+</div>

@@ -1,0 +1,36 @@
+<div class="flex p-4 relative border-2 border-teal-800 border-solid rounded-4xl">
+    <div class="relative w-full">
+        <div class="sticky pPanel pl-1.5">
+            <span class="font-bold">
+                {{this.entry().fechaCreacion|date:"medium"}}
+            </span>
+        </div>
+        <div class="pt-3 flex-wrap">
+            @if(!this.isEditingContent()){
+                <p class="text-balance wrap-anywhere">
+                    {{this.entry().content}}
+                </p>
+            }@else {
+                <form class="flex w-full" >
+                    <textarea class="w-full" pTextarea  [formControl]="this.content"></textarea>
+                </form>
+            }
+        </div>
+        <div class="pt-2">
+            <div class="flex justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    @if(!this.isEditingContent()){
+                        <app-button-delete [id]="this.entry().id" [type]="'Entrada'" (deleteItem)="deleteEntry()"/>
+                        <p-button  rounded text (onClick)="activeEditContent()" severity="info" [raised]="true">Editar</p-button>
+                   
+                    }@else {
+                        <p-button  rounded text (onClick)="cancelPatch()" severity="danger">Cancelar</p-button>
+                        <p-button  rounded text (onClick)="patchContent()" severity="success" >Guardar</p-button>
+                   
+                    }
+                 </div>
+                <span class="text-surface-500 dark:text-surface-400">{{this.entry().fechaEdicion|date:"medium"}}</span>
+            </div>
+        </div>
+    </div>
+</div>

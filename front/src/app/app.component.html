@@ -1,0 +1,20 @@
+<p-panel styleClass="w-full h-full p-10">
+    <ng-template #header>
+        <h1 class="text-5xl">
+            Blog personal
+        </h1>
+    </ng-template>
+    <div class="inline-flex flex-row w-full">
+        <app-form-blog class="flex w-2/5"/>
+    </div>
+    <div class="flex gap-x-10 pt-5">
+        <div class="w-1/5 min-w-lg">
+            <app-blog-container/>
+        </div>
+        <div class="w-3/5">
+            <p-scrollpanel>
+                <app-entry-container/>
+            </p-scrollpanel>
+        </div>
+    </div>
+</p-panel>

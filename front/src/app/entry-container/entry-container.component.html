@@ -1,0 +1,18 @@
+<div>
+    <div>
+        <app-form-entry class="flex w-/3/5"/>
+    </div>
+    <div class="pt-4">
+        @if(this.entrys.length === 0){
+            <h1>No hay entradas al blog</h1>
+        }@else {
+            <div class="flex flex-col gap-y-2">
+                @for(entry of this.entrys;track entry.id){
+                    <app-entry 
+                    [inputEntry]="entry" 
+                    (isEntryDeleted)="deleteEntry($event)"></app-entry>
+                }
+            </div>
+        }
+    </div>
+</div>
